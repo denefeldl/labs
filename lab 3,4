@@ -1,0 +1,156 @@
+def field(items, *args):
+    assert len(args) > 0
+    
+    if len(args) == 1:
+        for item in items:
+            value = item.get(args[0])
+            if value is not None:
+                yield value
+    else:
+        for item in items:
+            result = {key: item.get(key) for key in args if item.get(key) is not None}
+            if result:
+                yield result
+
+# Тест
+if __name__ == "__main__":
+    goods = [
+        {'title': 'Ковер', 'price': 2000, 'color': 'green'},
+        {'title': 'Диван для отдыха', 'color': 'black'}
+    ]
+    print(list(field(goods, 'title')))
+    print(list(field(goods, 'title', 'price')))
+
+import random
+
+def gen_random(num_count, begin, end):
+    for _ in range(num_count):
+        yield random.randint(begin, end)
+
+# Тест
+if __name__ == "__main__":
+    print(list(gen_random(7, 1, 4)))
+
+class Unique:
+    def __init__(self, items, **kwargs):
+        self.items = iter(items)
+        self.ignore_case = kwargs.get('ignore_case', False)
+        self.seen = set()
+        
+    def __iter__(self):
+        return self
+    
+    def __next__(self):
+        while True:
+            item = next(self.items)
+            comp_item = item.lower() if self.ignore_case and isinstance(item, str) else item
+            if comp_item not in self.seen:
+                self.seen.add(comp_item)
+                return item
+
+# Тест
+if __name__ == "__main__":
+    data = [1, 1, 2, 2, 'a', 'A', 'b', 'B', 'Оля','оля']
+    for item in Unique(data, ignore_case=False):
+        print(item)
+
+from contextlib import contextmanager
+import time
+
+# Контекстный менеджер на основе класса
+class cm_timer_1:
+    def __enter__(self):
+        self.start_time = time.time()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        print(f'time: {time.time() - self.start_time}')
+
+# Контекстный менеджер с использованием contextlib
+@contextmanager
+def cm_timer_2():
+    start_time = time.time()
+    yield
+    print(f'time: {time.time() - start_time}')
+
+
+
+def haha(x):
+    print(x)
+    return -x
+
+data = [4, -30, 30, 100, -100, 123, 1, 0, -1, -4]
+
+if __name__ == '__main__':
+    # Без lambda-функции
+    with cm_timer_1():
+        result = sorted(data, key=abs, reverse=True)
+        print(result)
+
+    # С lambda-функцией
+    with cm_timer_1():
+        result_with_lambda = sorted(data, key=lambda x: haha(x), reverse=True)
+        print(result_with_lambda)
+
+
+def print_result(func):
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        print(func.__name__)
+        if isinstance(result, list):
+            print('\n'.join(map(str, result)))
+        elif isinstance(result, dict):
+            print('\n'.join(f"{k} = {v}" for k, v in result.items()))
+        else:
+            print(result)
+        return result
+    return wrapper
+
+# Тесты
+@print_result
+def test_1():
+    return 1
+
+@print_result
+def test_2():
+    return 'iu5'
+
+@print_result
+def test_3():
+    return {'a': 1, 'b': 2}
+
+@print_result
+def test_4():
+    return [1, 2]
+
+if __name__ == '__main__':
+    test_1()
+    test_2()
+    test_3()
+    test_4()
+
+
+import time
+from contextlib import contextmanager
+
+# Контекстный менеджер на основе класса
+class cm_timer_1:
+    def __enter__(self):
+        self.start_time = time.time()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        print(f'time: {time.time() - self.start_time}')
+
+# Контекстный менеджер с использованием contextlib
+@contextmanager
+def cm_timer_2():
+    start_time = time.time()
+    yield
+    print(f'time: {time.time() - start_time}')
+
+# Тест
+if __name__ == "__main__":
+    with cm_timer_1():
+        time.sleep(4)
+    
+    with cm_timer_2():
+        time.sleep(1)
